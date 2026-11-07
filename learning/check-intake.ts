@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {readPracticeJson} from '../lib/intake.ts';
+const result=readPracticeJson(JSON.stringify({mawb:'020-12345675',pieces:24,customsStatus:'release',id:'untrusted',checks:[true]}));
+assert.equal(result.pieces,'24');
+assert.equal(result.customsStatus,'release');
+assert.equal(result.id,undefined);
+assert.equal(result.checks,undefined);
+assert.throws(()=>readPracticeJson('{"mawb":"wrong"}'));
+assert.equal(readPracticeJson('{"mawb":"020-12345675","customsStatus":"invented"}').customsStatus,'unknown');
+console.log('6 structured-intake checks passed.');

@@ -1,0 +1,50 @@
+// Small, independent rules: presence and entered-field consistency only.
+// These checks do not verify customs status, authenticity or release.
+export type Shipment = {
+  id: string;
+  mawb: string;
+  route: string;
+  pieces: string;
+  weight: string;
+  manifestPieces: string;
+  manifestWeight: string;
+  mrn: string;
+  procedure: string;
+  status: string;
+  checks: boolean[];
+  documents: { key: string; name: string }[];
+  history: string[];
+  customsStatus?: string;
+  evidence?: string;
+  demo?: boolean;
+};
+export function flags(s: Shipment, de = false) {
+  const a: string[] = [];
+  if (s.customsStatus && s.customsStatus !== "unknown" && !s.evidence?.trim())
+    a.push(
+      de ? "Quelle zum Zollstatus fehlt" : "Missing customs-status source",
+    );
+  if (!s.mrn) a.push(de ? "MRN fehlt" : "Missing MRN");
+  else if (!/^\d{2}[A-Z]{2}[A-Z0-9]{14}$/.test(s.mrn))
+    a.push(de ? "MRN-Format prüfen" : "Check MRN format");
+  if (
+    [s.pieces, s.weight, s.manifestPieces, s.manifestWeight].some(
+      (v) => !v.trim() || !Number.isFinite(Number(v)) || Number(v) <= 0,
+    )
+  )
+    a.push(de ? "Menge/Gewicht unvollständig" : "Incomplete pieces / weight");
+  if (
+    s.pieces &&
+    s.manifestPieces &&
+    Number(s.pieces) !== Number(s.manifestPieces)
+  )
+    a.push(de ? "Packstückzahl weicht ab" : "Piece count mismatch");
+  if (
+    s.weight &&
+    s.manifestWeight &&
+    Number(s.weight) !== Number(s.manifestWeight)
+  )
+    a.push(de ? "Gewicht weicht ab" : "Weight mismatch");
+  if (!s.procedure) a.push(de ? "Verfahren fehlt" : "Missing procedure");
+  return a;
+}
