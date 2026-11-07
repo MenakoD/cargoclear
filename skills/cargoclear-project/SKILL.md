@@ -40,3 +40,9 @@ Use Remotion for requested workflow motion graphics and its matching skill for i
 Choose the next module from real feedback and learning progress: missing-field checks, manifest comparison, document text extraction with corrections, AI suggestions with source evidence, then coordination of tested tools. Suggest roles, evidence links, export formats, change history and feedback triage when they solve a concrete need. Do not imply that creating this skill authorises deploying unrelated apps, publishing social posts or connecting operational systems.
 
 When finishing a change, report the practical outcome, checks performed, material unverified behaviour and one manageable next learning action. Maintain a local readable SKILL.md copy with the source when this project is shared.
+
+## GitHub Pages edition
+
+The public repository `MenakoD/cargoclear` also has a static GitHub Pages edition. Its entry point is `pages/main.tsx`; `vite.pages.config.ts` builds the same screen with `browserOnly` enabled. `lib/browser-storage.ts` keeps practice records in localStorage and files in IndexedDB. Feedback opens a public GitHub Issues draft for the user to submit. Preserve these distinctions from the original server-backed Site.
+
+GitHub Pages publishes the committed `docs/` folder from `main`. After source edits for this edition, run `npm run build:pages` and include regenerated `docs/` in the commit. Keep `/cargoclear/` as the asset prefix for this repository. Do not assume a push to GitHub changes the original Sites deployment or that updating Sites publishes Pages.

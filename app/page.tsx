@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { flags, type Shipment } from "../lib/checks";
 import { readPracticeJson } from "../lib/intake";
+import { browserRequest, downloadLocalDocument } from "../lib/browser-storage";
 type ApiResponse = {
   error?: string;
   shipments: Shipment[];
@@ -89,7 +90,11 @@ const samples: Shipment[] = [
 
 // The main workspace combines a few independent learning modules.
 // State remembers what is currently on screen; API requests save lasting records.
-export default function Home() {
+export default function Home({
+  browserOnly = false,
+}: { browserOnly?: boolean } = {}) {
+  const fetchData = browserOnly ? browserRequest : fetch;
+  const assetBase = browserOnly ? "/cargoclear" : "";
   const [de, setGerman] = useState(false),
     [page, setPage] = useState("overview"),
     [rows, setShipments] = useState<Shipment[]>([]),
@@ -107,7 +112,7 @@ export default function Home() {
   const t = (en: string, ge: string) => (de ? ge : en);
   useEffect(() => {
     setGerman(localStorage.getItem("cargo-language") === "de");
-    fetch("/api/shipments")
+    fetchData("/api/shipments")
       .then((r) => r.json() as Promise<ApiResponse>)
       .then((d) => {
         if (d.error) throw Error(d.error);
@@ -131,7 +136,7 @@ export default function Home() {
     setBusy(true);
     try {
       if (!s.demo) {
-        const r = await fetch("/api/shipments", {
+        const r = await fetchData("/api/shipments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(s),
@@ -190,7 +195,10 @@ export default function Home() {
         : {};
       const data = new FormData();
       data.append("file", file);
-      const r = await fetch("/api/documents", { method: "POST", body: data });
+      const r = await fetchData("/api/documents", {
+        method: "POST",
+        body: data,
+      });
       const d = (await r.json()) as ApiResponse;
       if (!r.ok) throw Error(d.error);
       const s = {
@@ -281,9 +289,34 @@ export default function Home() {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
+    if (browserOnly) {
+      const parameters = new URLSearchParams({
+        title: "[" + String(data.get("category")) + "] CargoClear feedback",
+        body:
+          "Page: " +
+          page +
+          "\n\n" +
+          String(data.get("message")) +
+          "\n\nSubmitted from the GitHub Pages practice version. Fictional examples only.",
+      });
+      window.open(
+        "https://github.com/MenakoD/cargoclear/issues/new?" +
+          parameters.toString(),
+        "_blank",
+        "noopener,noreferrer",
+      );
+      setNotice(
+        t(
+          "A GitHub issue draft was opened. Review and submit it there; feedback is public.",
+          "Ein GitHub-Issue-Entwurf wurde geöffnet. Dort prüfen und absenden; das Feedback ist öffentlich.",
+        ),
+      );
+      setModal(null);
+      return;
+    }
     setBusy(true);
     try {
-      const r = await fetch("/api/feedback", {
+      const r = await fetchData("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -340,7 +373,11 @@ export default function Home() {
   return (
     <div className="shell">
       <aside>
-        <a className="brand" href="/" aria-label="CargoClear home">
+        <a
+          className="brand"
+          href={assetBase + "/"}
+          aria-label="CargoClear home"
+        >
           <span className="brand-icon">
             <Package size={24} />
           </span>
@@ -414,8 +451,12 @@ export default function Home() {
       <main>
         <div className="public-banner">
           {t(
-            "PUBLIC PRACTICE SITE · Fictional data only · Your workspace is separate in this browser. Clearing cookies loses access to it.",
-            "ÖFFENTLICHE ÜBUNGSSEITE · Nur erfundene Daten · Separater Arbeitsbereich in diesem Browser. Ohne Cookies ist er nicht mehr zugänglich.",
+            browserOnly
+              ? "GITHUB PAGES PRACTICE · Fictional data only · Records and documents stay in this browser. Clearing site data removes them. Feedback opens a public GitHub issue."
+              : "PUBLIC PRACTICE SITE · Fictional data only · Your workspace is separate in this browser. Clearing cookies loses access to it.",
+            browserOnly
+              ? "GITHUB-PAGES-ÜBUNG · Nur erfundene Daten · Datensätze und Dokumente bleiben in diesem Browser. Löschen der Websitedaten entfernt sie. Feedback öffnet ein öffentliches GitHub-Issue."
+              : "ÖFFENTLICHE ÜBUNGSSEITE · Nur erfundene Daten · Separater Arbeitsbereich in diesem Browser. Ohne Cookies ist er nicht mehr zugänglich.",
           )}
         </div>
         <header>
@@ -1068,7 +1109,7 @@ export default function Home() {
                   </button>
                   <a
                     className="text-button"
-                    href="/practice-shipment.json"
+                    href={assetBase + "/practice-shipment.json"}
                     download
                   >
                     {t(
@@ -1204,34 +1245,54 @@ export default function Home() {
                   </span>
                 ))}
               </div>
-              <a
-                className="text-button"
-                href="/signin-with-chatgpt?return_to=/"
-              >
-                {t("Owner sign in", "Anmeldung Projektleitung")} ↗
-              </a>
-              <br />
-              <button
-                className="text-button"
-                onClick={async () => {
-                  const r = await fetch("/api/feedback");
-                  if (!r.ok) {
-                    setNotice(
-                      t(
-                        "Feedback inbox is available to the signed-in project owner.",
-                        "Feedback-Postfach nur für die angemeldete Projektleitung.",
-                      ),
-                    );
-                    return;
-                  }
-                  setFeedbackItems(((await r.json()) as ApiResponse).feedback);
-                }}
-              >
-                {t(
-                  "Owner: open feedback inbox",
-                  "Projektleitung: Feedback öffnen",
-                )}
-              </button>
+              {browserOnly ? (
+                <a
+                  className="text-button"
+                  href="https://github.com/MenakoD/cargoclear/issues"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t(
+                    "Read community feedback on GitHub",
+                    "Community-Feedback auf GitHub lesen",
+                  )}{" "}
+                  ↗
+                </a>
+              ) : (
+                <>
+                  {" "}
+                  <a
+                    className="text-button"
+                    href="/signin-with-chatgpt?return_to=/"
+                  >
+                    {t("Owner sign in", "Anmeldung Projektleitung")} ↗
+                  </a>
+                  <br />
+                  <button
+                    className="text-button"
+                    onClick={async () => {
+                      const r = await fetchData("/api/feedback");
+                      if (!r.ok) {
+                        setNotice(
+                          t(
+                            "Feedback inbox is available to the signed-in project owner.",
+                            "Feedback-Postfach nur für die angemeldete Projektleitung.",
+                          ),
+                        );
+                        return;
+                      }
+                      setFeedbackItems(
+                        ((await r.json()) as ApiResponse).feedback,
+                      );
+                    }}
+                  >
+                    {t(
+                      "Owner: open feedback inbox",
+                      "Projektleitung: Feedback öffnen",
+                    )}
+                  </button>
+                </>
+              )}
               {feedbackItems.map((f, i) => (
                 <div className="feedback-list" key={i}>
                   <strong>
@@ -1254,8 +1315,12 @@ export default function Home() {
                 <h3>app/api/ · db/</h3>
                 <p>
                   {t(
-                    "The server saves shipment records in a database and documents in file storage. Saved records can be reloaded across visits.",
-                    "Der Server speichert Sendungsdaten in einer Datenbank und Dokumente im Dateispeicher. Daten werden bei späteren Besuchen geladen.",
+                    browserOnly
+                      ? "This GitHub Pages version saves practice records and documents in your browser. The original hosted version uses a server database and file storage."
+                      : "The server saves shipment records in a database and documents in file storage. Saved records can be reloaded across visits.",
+                    browserOnly
+                      ? "Diese GitHub-Pages-Version speichert Übungsdaten und Dokumente im Browser. Die ursprüngliche Version nutzt eine Serverdatenbank und einen Dateispeicher."
+                      : "Der Server speichert Sendungsdaten in einer Datenbank und Dokumente im Dateispeicher. Daten werden bei späteren Besuchen geladen.",
                   )}
                 </p>
               </div>
@@ -1271,20 +1336,24 @@ export default function Home() {
               <div className="actions">
                 <a
                   className="outline-button"
-                  href="/source/comparison-rules.txt"
+                  href={assetBase + "/source/comparison-rules.txt"}
                   target="_blank"
                 >
                   {t("Read the comparison rules", "Vergleichsregeln lesen")} ↗
                 </a>
                 <a
                   className="outline-button"
-                  href="/source/learning-guide.txt"
+                  href={assetBase + "/source/learning-guide.txt"}
                   target="_blank"
                 >
                   {t("Read the beginner guide", "Anleitung lesen")} ↗
                 </a>
               </div>
-              <a className="primary" href="/cargoclear-source.zip" download>
+              <a
+                className="primary"
+                href={assetBase + "/cargoclear-source.zip"}
+                download
+              >
                 <Download size={17} />
                 {t(
                   "Download readable source code",
@@ -1360,8 +1429,12 @@ export default function Home() {
                 </h2>
                 <p>
                   {t(
-                    "What worked? What was confusing? Which repetitive task should we tackle next? Please leave out customer, shipment and personal details. Your feedback is visible to the project owner.",
-                    "Was funktioniert? Was ist unklar? Welche Routineaufgabe sollen wir als Nächstes angehen? Bitte keine Kunden-, Sendungs- oder persönlichen Daten angeben. Dein Feedback ist für die Projektleitung sichtbar.",
+                    browserOnly
+                      ? "What worked? What was confusing? Your text will open as a public GitHub issue draft. You need a GitHub account and must submit the draft there. Include fictional examples only; no personal or shipment details."
+                      : "What worked? What was confusing? Which repetitive task should we tackle next? Please leave out customer, shipment and personal details. Your feedback is visible to the project owner.",
+                    browserOnly
+                      ? "Was funktioniert? Was ist unklar? Dein Text öffnet sich als öffentlicher GitHub-Issue-Entwurf. Ein GitHub-Konto ist nötig; sende den Entwurf dort ab. Nur erfundene Beispiele, keine persönlichen oder Sendungsdaten."
+                      : "Was funktioniert? Was ist unklar? Welche Routineaufgabe sollen wir als Nächstes angehen? Bitte keine Kunden-, Sendungs- oder persönlichen Daten angeben. Dein Feedback ist für die Projektleitung sichtbar.",
                   )}
                 </p>
                 <form onSubmit={sendFeedback}>
@@ -1409,7 +1482,12 @@ export default function Home() {
                   </small>
                   <div className="actions">
                     <button className="primary" disabled={busy}>
-                      {t("Send feedback", "Feedback senden")}
+                      {t(
+                        browserOnly ? "Open GitHub draft" : "Send feedback",
+                        browserOnly
+                          ? "GitHub-Entwurf öffnen"
+                          : "Feedback senden",
+                      )}
                     </button>
                   </div>
                 </form>
@@ -1497,7 +1575,17 @@ export default function Home() {
                     <a
                       key={doc.key}
                       className="document-link"
-                      href={"/api/documents?key=" + doc.key}
+                      href={browserOnly ? "#" : "/api/documents?key=" + doc.key}
+                      onClick={
+                        browserOnly
+                          ? (event) => {
+                              event.preventDefault();
+                              downloadLocalDocument(doc.key, doc.name).catch(
+                                (error) => setNotice(String(error)),
+                              );
+                            }
+                          : undefined
+                      }
                     >
                       {doc.name} ↗
                     </a>

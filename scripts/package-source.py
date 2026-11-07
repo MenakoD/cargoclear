@@ -4,7 +4,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 import json
 import os
 root = Path(__file__).resolve().parent.parent
-excluded = {'.git', 'node_modules', '.wrangler', '.sites-runtime', 'dist', '.next', '.vinext', 'outputs', '.agents', '.codex', '__pycache__'}
+excluded = {'docs', '.git', 'node_modules', '.wrangler', '.sites-runtime', 'dist', '.next', '.vinext', 'outputs', '.agents', '.codex', '__pycache__'}
 preview = root / 'public' / 'source'
 preview.mkdir(exist_ok=True)
 for source, name in [('lib/checks.ts', 'comparison-rules.txt'), ('LEARNING_GUIDE.md', 'learning-guide.txt'), ('learning/missing_mrn.py', 'missing-mrn.txt')]:

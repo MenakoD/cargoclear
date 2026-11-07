@@ -1,0 +1,12 @@
+{
+  "mawb": "020-12345675",
+  "route": "FRA → JFK",
+  "pieces": "24",
+  "weight": "1240",
+  "manifestPieces": "22",
+  "manifestWeight": "1240",
+  "mrn": "",
+  "procedure": "T1",
+  "customsStatus": "transit",
+  "evidence": "Fictional practice document, 7 November 2026"
+}

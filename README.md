@@ -6,6 +6,16 @@ A bilingual air-cargo document review and learning project. Built by a cargo ope
 
 Repeated arrival checks are a useful starting point for learning Python and automation. CargoClear keeps the work small: capture a document, compare entered details, record differences and let a person review the result.
 
+## GitHub Pages version
+
+A second, static version is published at [MenakoD.github.io/cargoclear](https://menakod.github.io/cargoclear/).
+
+GitHub Pages does not run this project's server routes. `pages/main.tsx` opens the same React interface with `browserOnly` enabled. `lib/browser-storage.ts` stores records with localStorage and attached files with IndexedDB. These are two built-in browser storage tools. Nothing synchronises between browsers, and clearing site data removes the saved practice data. Feedback opens a public GitHub Issues draft that the visitor must review and submit.
+
+The original hosted version retains its server-backed storage and private owner feedback inbox.
+
+To update Pages after editing the source, run `npm run build:pages`, commit the updated `docs/` folder and push `main`. GitHub Pages publishes from `main` → `/docs`. `vite.pages.config.ts` sets the `/cargoclear/` address prefix so assets and downloads work correctly.
+
 ## Try it
 
 [Open the live CargoClear practice site](https://cargo-clear-grace.menakod.chatgpt.site/)

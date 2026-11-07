@@ -43,3 +43,6 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Rebuilt source download, copied into the Pages output during build
+/public/cargoclear-source.zip
