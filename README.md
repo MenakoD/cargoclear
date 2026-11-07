@@ -40,7 +40,7 @@ The public preview is for **fictional practice data only**. Every visitor gets a
 
 Scanned documents are stored, but **OCR (automatic text reading) is not implemented**. No AI model is called. A barcode can identify a shipment; it does not establish customs status. MRN format checks do not verify authenticity, release, discharge, validity or customs-office decisions. A completed review records a person's review only. Adapt any checklist to approved company procedures before real operational use.
 
-The animation is silent. The requested future English voice is **Ryan, male**. Connect a specific provider and voice ID before producing narration; do not silently substitute a different voice.
+The workflow explainer is narrated by **Microsoft Ryan**, British English male, voice ID `en-GB-RyanNeural`. Audio recordings are committed in `public/audio/workflow-ryan/`; playback makes no speech-service request. English or German captions follow the selected interface language. Remotion synchronises narration, animation, play/pause, mute and seeking. To regenerate the recordings, install the development-only Python packages `edge-tts` and `mutagen`, then run `python scripts/generate_workflow_voice.py`. The measured durations are written to `app/workflow-narration.json`; preserve this voice ID for consistency.
 
 ## Read the code
 

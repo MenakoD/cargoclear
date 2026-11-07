@@ -53,7 +53,7 @@ The visible screen runs in your browser. Saving runs on the server. A change on 
 
 ## How the animation works
 
-`app/motion.tsx` asks Remotion for the current frame, like a numbered page in a flipbook. `interpolate()` converts frame progress into a position. `Player` in `app/page.tsx` supplies play/pause and the timeline. The animation is intentionally silent; it does not select a random browser voice.
+`app/motion.tsx` asks Remotion for the current frame, like a numbered page in a flipbook. `interpolate()` converts frame progress into a position. `Player` in `app/page.tsx` supplies play/pause and the timeline. The narration uses committed Microsoft Ryan recordings, not a random browser voice. `app/workflow-narration.json` stores their measured timing. Remotion uses those timings for each scene, caption and audio clip, so pausing or seeking keeps them together. German mode translates captions while retaining the same English voice.
 
 ## How public practice records stay separate
 

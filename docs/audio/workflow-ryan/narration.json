@@ -1,0 +1,42 @@
+{
+  "provider": "Microsoft Edge online speech",
+  "voiceId": "en-GB-RyanNeural",
+  "voiceName": "Microsoft Ryan",
+  "language": "en-GB",
+  "rate": "-5%",
+  "durationSeconds": 34.422,
+  "segments": [
+    {
+      "id": "capture",
+      "file": "capture.mp3",
+      "text": "Start by uploading a document, or scanning the code on a master air waybill, C M R, or manifest.",
+      "german": "Lade ein Dokument hoch oder scanne den Code auf einem Hauptluftfrachtbrief, CMR oder Manifest.",
+      "startSeconds": 0.35,
+      "audioSeconds": 7.728
+    },
+    {
+      "id": "compare",
+      "file": "compare.mp3",
+      "text": "Next, compare the shipment references, piece count, and gross weight across the documents.",
+      "german": "Vergleiche danach Sendungsreferenzen, Packstückzahl und Bruttogewicht in den Dokumenten.",
+      "startSeconds": 8.528,
+      "audioSeconds": 6.552
+    },
+    {
+      "id": "flag",
+      "file": "flag.mp3",
+      "text": "CargoClear flags missing information and mismatched details, so you know what needs attention.",
+      "german": "CargoClear markiert fehlende Angaben und Abweichungen, damit du weißt, was geprüft werden muss.",
+      "startSeconds": 15.53,
+      "audioSeconds": 6.264
+    },
+    {
+      "id": "review",
+      "file": "review.mp3",
+      "text": "Check the evidence, resolve discrepancies, and record your review. A person makes the final decision. These checks do not confirm customs release.",
+      "german": "Prüfe Nachweise, kläre Abweichungen und dokumentiere deine Prüfung. Ein Mensch entscheidet. Diese Prüfungen bestätigen keine Zollfreigabe.",
+      "startSeconds": 22.244,
+      "audioSeconds": 11.328
+    }
+  ]
+}

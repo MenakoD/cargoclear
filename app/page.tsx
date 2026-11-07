@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Player } from "@remotion/player";
 import { Workflow } from "./motion";
+import workflowNarration from "./workflow-narration.json";
 import {
   LayoutDashboard,
   Package,
@@ -910,7 +911,7 @@ export default function Home({
                       <h3>{t("What does MRN mean?", "Was bedeutet MRN?")}</h3>
                       <p>
                         {t(
-                          "setActiveShipment reference assigned by customs to identify a declaration.",
+                          "A reference assigned by customs to identify a declaration.",
                           "Eine vom Zoll vergebene Referenz zur Identifikation einer Anmeldung.",
                         )}
                       </p>
@@ -1027,7 +1028,7 @@ export default function Home({
                   </h2>
                   <p>
                     {t(
-                      "setActiveShipment variable is a named box for a value. Here, mrn is an empty box. An if statement asks a yes/no question: is this box empty?",
+                      "A variable is a named box for a value. Here, mrn is an empty box. An if statement asks a yes/no question: is this box empty?",
                       "Eine Variable ist eine benannte Box für einen Wert. Hier ist mrn leer. Eine if-Anweisung stellt eine Ja/Nein-Frage: Ist diese Box leer?",
                     )}
                   </p>
@@ -1089,7 +1090,7 @@ export default function Home({
                   {reveal && (
                     <p className="explanation">
                       {t(
-                        "Two issues: the piece counts differ and the MRN is missing. Ask for clarification and record the evidence before completing the review. setActiveShipment matching count alone would not prove customs release.",
+                        "Two issues: the piece counts differ and the MRN is missing. Ask for clarification and record the evidence before completing the review. A matching count alone would not prove customs release.",
                         "Zwei Probleme: Die Packstückzahlen weichen ab und die MRN fehlt. Klärung einholen und Nachweise dokumentieren. Gleiche Mengen allein beweisen keine Zollfreigabe.",
                       )}
                     </p>
@@ -1186,7 +1187,7 @@ export default function Home({
                 [
                   "AI agent",
                   t(
-                    "setActiveShipment program that uses AI to choose and use tools for a task. Start with reliable small tools and keep human approval for operational decisions.",
+                    "A program that uses AI to choose and use tools for a task. Start with reliable small tools and keep human approval for operational decisions.",
                     "Ein Programm, das mit KI Werkzeuge für eine Aufgabe auswählt. Beginne mit zuverlässigen kleinen Tools und menschlicher Prüfung.",
                   ),
                 ],
@@ -1211,8 +1212,8 @@ export default function Home({
               <hr />
               <p>
                 {t(
-                  "Motion graphics use Remotion. Voice preference: Ryan, English male. No voiceover is generated in this version; a future recording should use your chosen Ryan voice provider and voice ID consistently.",
-                  "Die Animation nutzt Remotion. Stimmpräferenz: Ryan, Englisch, männlich. Diese Version enthält keine Sprachaufnahme; künftige Aufnahmen sollen denselben Ryan-Anbieter und dieselbe Stimm-ID nutzen.",
+                  "The workflow explainer uses Remotion with Microsoft Ryan (en-GB-RyanNeural), a British English male voice. Play, pause, mute and seek control both the recording and animation. German mode shows translated captions with the same English voice.",
+                  "Die Ablauf-Erklärung nutzt Remotion mit Microsoft Ryan (en-GB-RyanNeural), einer britisch-englischen Männerstimme. Wiedergabe, Pause, Stummschaltung und Zeitleiste steuern Ton und Animation. Im deutschen Modus erscheinen übersetzte Untertitel zur englischen Stimme.",
                 )}
               </p>
             </section>
@@ -1495,13 +1496,18 @@ export default function Home({
             ) : modal === "motion" ? (
               <Player
                 component={Workflow}
-                inputProps={{ de }}
-                durationInFrames={240}
+                inputProps={{
+                  de,
+                  audioBase: assetBase + "/audio/workflow-ryan",
+                }}
+                durationInFrames={Math.ceil(
+                  workflowNarration.durationSeconds * 30,
+                )}
                 compositionWidth={760}
-                compositionHeight={330}
+                compositionHeight={430}
                 fps={30}
                 controls
-                autoPlay
+                autoPlay={false}
                 style={{ width: "100%" }}
               />
             ) : modal === "scan" ? (
@@ -1511,7 +1517,7 @@ export default function Home({
                 </h2>
                 <p>
                   {t(
-                    "Scan a MAWB barcode or a QR code containing the MAWB. setActiveShipment USB scanner can type into the field below.",
+                    "Scan a MAWB barcode or a QR code containing the MAWB. A USB scanner can type into the field below.",
                     "MAWB-, CMR- oder Manifest-Code scannen. Eine MAWB öffnet die Sendung; andere Referenzen werden zur manuellen Zuordnung erfasst. USB-Scanner können unten eingeben.",
                   )}
                 </p>

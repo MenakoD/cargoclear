@@ -33,7 +33,7 @@ Use `scripts/package-source.py` when it exists to refresh the public source down
 
 ## Motion and voice
 
-Use Remotion for requested workflow motion graphics and its matching skill for implementation. Respect playback controls and readable captions. Voice is optional; the user's consistent preference is Ryan, English male. If narration is actually requested, establish the exact provider and voice ID and reuse them. Do not silently substitute a generic browser voice or claim a silent animation has narration.
+Use Remotion for requested workflow motion graphics and its matching skill for implementation. Respect playback controls and readable captions. The chosen narrator is Microsoft Ryan, British English male, voice ID `en-GB-RyanNeural`, generated using Microsoft Edge online speech through `edge-tts`. Preserve that ID and the committed recordings. `scripts/generate_workflow_voice.py` regenerates clips and measured timing metadata. The explainer uses `@remotion/media` Audio, with English or German captions following interface language; narration stays English. Keep mute, pause and seeking synchronised with the same Remotion timeline. Never silently substitute a browser voice.
 
 ## Future modules
 

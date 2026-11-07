@@ -5,10 +5,25 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-export function Workflow({ de = false }: { de?: boolean }) {
-  const f = useCurrentFrame();
+import { Audio } from "@remotion/media";
+import narration from "./workflow-narration.json";
+
+// The metadata is measured from the committed MP3s. One timeline controls
+// the narration, the highlighted stage and the captions, including seeking.
+export function Workflow({
+  de = false,
+  audioBase = "/audio/workflow-ryan",
+}: {
+  de?: boolean;
+  audioBase?: string;
+}) {
+  const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const step = Math.min(3, Math.floor(f / (fps * 2)));
+  const step = narration.segments.reduce(
+    (current, segment, index) =>
+      frame >= Math.round(segment.startSeconds * fps) ? index : current,
+    0,
+  );
   return (
     <AbsoluteFill
       style={{
@@ -18,6 +33,16 @@ export function Workflow({ de = false }: { de?: boolean }) {
         fontFamily: "Arial",
       }}
     >
+      {narration.segments.map((segment) => (
+        <Audio
+          key={segment.id}
+          name={"Ryan / " + segment.id}
+          src={audioBase + "/" + segment.file}
+          from={Math.round(segment.startSeconds * fps)}
+          durationInFrames={Math.ceil(segment.audioSeconds * fps)}
+          premountFor={fps}
+        />
+      ))}
       <div style={{ fontSize: 14, color: "#b4d6b8", letterSpacing: 3 }}>
         CARGOCLEAR / {de ? "DER ABLAUF" : "THE WORKFLOW"}
       </div>
@@ -38,33 +63,58 @@ export function Workflow({ de = false }: { de?: boolean }) {
               ])[step]
         }
       </div>
-      <div style={{ display: "flex", gap: 18, marginTop: 38 }}>
-        {["01", "02", "03", "04"].map((n, i) => (
+      <div style={{ display: "flex", gap: 18, marginTop: 32 }}>
+        {["01", "02", "03", "04"].map((number, index) => (
           <div
-            key={n}
+            key={number}
             style={{
               flex: 1,
-              borderTop: "2px solid " + (i <= step ? "#c4e89e" : "#476158"),
+              borderTop: "2px solid " + (index <= step ? "#c4e89e" : "#476158"),
               paddingTop: 16,
-              color: i <= step ? "#c4e89e" : "#718d80",
-              translate: `0px ${interpolate(f, [i * fps * 2, i * fps * 2 + 20], [12, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}px`,
+              color: index <= step ? "#c4e89e" : "#718d80",
+              translate: `0px ${interpolate(frame, [narration.segments[index].startSeconds * fps, narration.segments[index].startSeconds * fps + 20], [12, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" })}px`,
             }}
           >
-            <div style={{ fontSize: 30 }}>{n}</div>
+            <div style={{ fontSize: 30 }}>{number}</div>
             <div style={{ fontSize: 15, marginTop: 12 }}>
               {
                 (de
                   ? ["Erfassen", "Vergleichen", "Markieren", "Prüfen"]
-                  : ["Capture", "Compare", "Flag", "Review"])[i]
+                  : ["Capture", "Compare", "Flag", "Review"])[index]
               }
             </div>
           </div>
         ))}
       </div>
-      <div style={{ marginTop: 26, fontSize: 13, color: "#b2c5bc" }}>
+      <div
+        style={{
+          position: "absolute",
+          left: 38,
+          right: 38,
+          top: 265,
+          fontSize: 17,
+          lineHeight: 1.55,
+          color: "#e5efdf",
+          borderLeft: "2px solid #789b63",
+          paddingLeft: 14,
+        }}
+        aria-live="off"
+      >
+        {de ? narration.segments[step].german : narration.segments[step].text}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          left: 38,
+          right: 38,
+          bottom: 60,
+          fontSize: 11,
+          color: "#a6bdb0",
+        }}
+      >
         {de
-          ? "Jede Freigabe bleibt eine bewusste menschliche Entscheidung."
-          : "Every approval stays a considered human decision."}
+          ? "Englische Sprecherstimme: Microsoft Ryan · Die abschließende Entscheidung trifft ein Mensch."
+          : "English narration: Microsoft Ryan · A person makes the final decision."}
       </div>
     </AbsoluteFill>
   );
